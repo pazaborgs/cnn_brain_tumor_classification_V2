@@ -1,0 +1,35 @@
+[project]
+name = "cnn-brain-tumor-classification-v2"
+version = "0.1.0"
+description = "Brain Tumor MRI Classification V2"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "databricks-cli>=0.18.0",
+    "python-dotenv>=1.0.0",
+    "graphviz>=0.21",
+    "huggingface-hub>=1.26.0",
+    "kaggle>=2.2.3",
+    "matplotlib>=3.11.1",
+    "mlflow>=3.15.1",
+    "opencv-python-headless>=4.8.0",
+    "pydot>=4.0.1",
+    "scikit-learn>=1.9.0",
+    "seaborn>=0.13.2",
+    "streamlit>=1.60.0",
+    "tensorflow>=2.21.0",
+    "tqdm>=4.68.4",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.20",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

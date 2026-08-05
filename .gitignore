@@ -1,0 +1,79 @@
+# ==============================================================================
+# 🔑 SECRETS & CREDENTIALS
+# ==============================================================================
+.env
+.env.*
+.secrets/
+.kaggle/
+.databricks/
+.streamlit/secrets.toml
+!.streamlit/config.toml
+*.pem
+*.key
+
+# ==============================================================================
+# 📦 HEAVY DATASETS & TRAINED MODEL ARTIFACTS
+# (Keeps folder structure via .gitkeep while ignoring heavy binaries)
+# ==============================================================================
+data/raw/*
+!data/raw/.gitkeep
+!data/sample_mri/
+!data/sample_mri/**
+data/processed/*
+!data/processed/.gitkeep
+artifacts/models/*
+!artifacts/models/.gitkeep
+!artifacts/figures/
+!artifacts/figures/**
+
+# Heavy Model File Formats
+*.keras
+*.h5
+*.hdf5
+*.pb
+*.tflite
+*.onnx
+*.pth
+*.pt
+
+# ==============================================================================
+# 📊 MLOPS & EXPERIMENT TRACKING (MLflow)
+# ==============================================================================
+mlruns/
+mlartifacts/
+mlflow.db
+
+# ==============================================================================
+# 🐍 PYTHON & VIRTUAL ENVIRONMENTS
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+build/
+dist/
+wheels/
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# ==============================================================================
+# 📓 JUPYTER NOTEBOOKS & STREAMLIT
+# ==============================================================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ==============================================================================
+# 💻 IDE & OPERATING SYSTEM FILES
+# ==============================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
