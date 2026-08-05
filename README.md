@@ -30,7 +30,7 @@ Acesse a aplicação web em tempo real hospedada no **Streamlit Cloud**:
 | Componente              | Versão 1 (Notebook Original)                   | Versão 2 (Estrutura Atual)                                                         |
 | :---------------------- | :--------------------------------------------- | :--------------------------------------------------------------------------------- |
 | **Estrutura de Código** | Células sequenciais no Google Colab (`.ipynb`) | **Módulos Python** (`src/`, `main.py`) com docstrings no padrão Google             |
-| **Modelos**             | 2 modelos fixos (`CNN Custom`, `InceptionV3`)  | **Suporte Multi-Modelo** (`CNN Custom`, `InceptionV3`, `EfficientNetB0`)           |
+| **Modelos**             | 2 modelos fixos (`CNN Custom`, `InceptionV3`)  | **Suporte Multi-Modelo** (`CNN Custom`, `InceptionV3`, `EfficientNetB0`, `DenseNet121`) |
 | **Parâmetros**          | Variáveis declaradas no código                 | **Arquivo de Configuração YAML** ([config/config.yaml](config/config.yaml))        |
 | **MLOps & Registry**    | Métricas exibidas no console                   | **MLflow & Hugging Face Hub** (`pazaborgs/brain_tumor_classification_V2`)          |
 | **Artefatos**           | Arquivos na sessão temporária                  | **Diretório de Artefatos & Nuvem** (`artifacts/models/`, Hugging Face)             |
