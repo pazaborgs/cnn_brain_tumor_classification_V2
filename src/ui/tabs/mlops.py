@@ -169,65 +169,69 @@ def render_mlops_tab(config: dict, models_list: list, load_trained_model_fn):
                 else:
                     col2.metric("Parâmetros", "N/A")
 
-                epochs_val = (
-                    run_info["Epochs"]
-                    if run_info is not None and "Epochs" in run_info
-                    else "N/A"
+                def get_param_safe(key_short, key_long, config_key):
+                    if run_info is not None:
+                        val = None
+                        if key_short in run_info:
+                            val = run_info[key_short]
+                        elif key_long in run_info:
+                            val = run_info[key_long]
+                        if val is not None and not pd.isna(val):
+                            return val
+                    return config.get("training", {}).get(config_key, "N/A")
+
+                epochs_val = get_param_safe("Epochs", "Train Epochs", "epochs")
+                batch_val = get_param_safe(
+                    "Batch Size", "Train Batch Size", "batch_size"
                 )
-                batch_val = (
-                    run_info["Batch Size"]
-                    if run_info is not None and "Batch Size" in run_info
-                    else "N/A"
-                )
-                lr_val = (
-                    run_info["Learning Rate"]
-                    if run_info is not None and "Learning Rate" in run_info
-                    else "N/A"
+                lr_val = get_param_safe(
+                    "Learning Rate", "Train Learning Rate", "learning_rate"
                 )
 
                 col3.metric("Épocas", epochs_val)
                 col4.metric("Batch Size", batch_val)
                 col5.metric("Learning Rate", lr_val)
 
+                st.markdown("<br>", unsafe_allow_html=True)
+                arch_path = Path(f"artifacts/figures/{model_name}.png")
+                if arch_path.exists():
+                    with open(arch_path, "rb") as file:
+                        st.download_button(
+                            label=f":material/download: Baixar Planta da Arquitetura Neural ({model_name})",
+                            data=file,
+                            file_name=f"{model_name}_architecture.png",
+                            mime="image/png",
+                            type="primary",
+                            help="Diagrama completo de tensores gerado via plot_model.",
+                        )
+
                 st.divider()
 
-                # Imagens melhoradas em layout vertical (grafico historico é muito largo para dividir tela)
-                st.markdown("#### Histórico de Treinamento e Evolução de Perda")
-                hist_path = Path(f"artifacts/figures/{model_name}_history.png")
-                if hist_path.exists():
-                    st.image(str(hist_path), width="stretch", output_format="PNG")
-                else:
-                    st.info(
-                        "Execute `python main.py --mode train` para gerar o gráfico de histórico.",
-                        icon=":material/info:",
-                    )
+                # Layout lado a lado: Histórico + Matriz de Confusão
+                col_hist, col_cm = st.columns([0.6, 0.4], gap="medium")
 
-                st.markdown("<br>", unsafe_allow_html=True)
+                with col_hist:
+                    st.markdown("#### Histórico de Treinamento")
+                    hist_path = Path(f"artifacts/figures/{model_name}_history.png")
+                    if hist_path.exists():
+                        st.image(str(hist_path), width="stretch", output_format="PNG")
+                    else:
+                        st.info(
+                            "Execute `python main.py --mode train` para gerar o gráfico.",
+                            icon=":material/info:",
+                        )
 
-                st.markdown("#### Matriz de Confusão (Dados de Teste)")
-                cm_path = Path(f"artifacts/figures/{model_name}_confusion_matrix.png")
-
-                # A matriz é mais quadrada, podemos centralizá-ela numa coluna do meio para não ficar esticada demais
-                _, col_cm, _ = st.columns([1, 2, 1])
                 with col_cm:
+                    st.markdown("#### Matriz de Confusão")
+                    cm_path = Path(
+                        f"artifacts/figures/{model_name}_confusion_matrix.png"
+                    )
                     if cm_path.exists():
                         st.image(str(cm_path), width="stretch", output_format="PNG")
                     else:
                         st.info(
-                            "Execute `python main.py --mode evaluate` para gerar a matriz de confusão.",
+                            "Execute `python main.py --mode evaluate` para gerar a matriz.",
                             icon=":material/info:",
                         )
 
                 st.markdown("<br>", unsafe_allow_html=True)
-
-                with st.expander(
-                    "Visualizar Arquitetura da Rede Neural (Grafo)", expanded=False
-                ):
-                    arch_path = Path(f"artifacts/figures/{model_name}.png")
-                    if arch_path.exists():
-                        st.image(str(arch_path), width="stretch", output_format="PNG")
-                    else:
-                        st.info(
-                            f"O diagrama de arquitetura '{model_name}.png' não foi encontrado em artifacts/figures/.",
-                            icon=":material/info:",
-                        )

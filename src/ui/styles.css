@@ -11,18 +11,24 @@
     --alert: #DC2626;
 }
 
-html, body, [class*="css"] { font-family: 'Outfit', sans-serif !important; color: var(--text); }
-.stApp { background: var(--bg); }
-#MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; }
+/* Títulos divisores de Sessões */
+h1, h2, h3, h4 { color: var(--primary-dark) !important; font-weight: 700 !important; margin-top: 1.5rem !important; margin-bottom: 1rem !important; }
+h3, h4 { border-bottom: 2px solid var(--border); padding-bottom: 0.4rem; width: 100%; display: block; }
 
-div[data-testid="stVerticalBlock"] { gap: 0.8rem; }
-div.block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
+html, body, [class*="css"] { font-family: 'Outfit', sans-serif !important; color: var(--text); font-size: 1rem; }
+.stApp { background: var(--bg); }
+
+/* Ocultar footer nativo */
+footer { visibility: hidden; display: none; }
+
+div[data-testid="stVerticalBlock"] { gap: 0.5rem; }
+div.block-container { padding-top: 4.5rem; padding-bottom: 1rem; padding-left: 2rem; padding-right: 2rem; }
 
 /* ---------- Cabeçalho Principal ---------- */
 .app-titlebar {
     display: flex; align-items: center; justify-content: space-between;
     background: linear-gradient(135deg, #0F172A 0%, #047857 100%);
-    border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.2rem;
+    border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.8rem;
     box-shadow: 0 10px 25px -5px rgba(4,120,87,0.25);
 }
 .app-titlebar-left { display:flex; align-items:center; gap:0.8rem; }
@@ -30,6 +36,12 @@ div.block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
 .app-titlebar-left .txt { color:#F8FAFC; }
 .app-titlebar-left .txt .name { font-family:'JetBrains Mono', monospace; font-weight:700; font-size:1.1rem; }
 .app-titlebar-left .txt .sub { font-size:0.8rem; color: #A7F3D0; }
+
+/* ---------- Navegação (Tabs) ---------- */
+button[data-baseweb="tab"] { font-size: 1.05rem !important; font-weight: 600 !important; padding: 1rem 1.5rem !important; }
+button[data-baseweb="tab"] > div { color: #64748B !important; transition: color 0.2s ease; }
+button[data-baseweb="tab"][aria-selected="true"] > div { color: var(--primary-dark) !important; }
+div[data-baseweb="tab-highlight"] { background-color: var(--primary-dark) !important; height: 4px !important; border-radius: 4px 4px 0 0; }
 
 /* ---------- Janelas Estilo SO ---------- */
 div[data-testid="stVerticalBlockBorderWrapper"]:has(> div > div[data-testid="stVerticalBlock"]) {
@@ -41,11 +53,11 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(> div > div[data-testid="stV
 }
 .os-titlebar {
     display:flex; align-items:center; justify-content:space-between;
-    margin: -1rem -1rem 1rem -1rem; padding: 0.65rem 1rem;
+    margin: -1rem -1rem 0.8rem -1rem; padding: 0.4rem 0.8rem;
     background: linear-gradient(180deg, #F8FAFC 0%, #E2E8F0 100%);
     border-bottom: 1px solid var(--border); border-radius: 11px 11px 0 0;
 }
-.os-titlebar-left { display:flex; align-items:center; gap:0.6rem; font-family:'JetBrains Mono', monospace; font-size:0.85rem; font-weight:700; color: #0F172A; }
+.os-titlebar-left { display:flex; align-items:center; gap:0.5rem; font-family:'JetBrains Mono', monospace; font-size:0.8rem; font-weight:700; color: #0F172A; }
 
 /* ---------- Sidebar como Painel de Controle ---------- */
 section[data-testid="stSidebar"] { background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%); }
@@ -80,11 +92,24 @@ div[data-baseweb="select"] * { color: #0F172A !important; fill: #0F172A !importa
     color: #047857; border: 1px solid #A7F3D0; font-weight: 600;
 }
 
-/* Imagem centralizada e responsiva */
-div[data-testid="stImage"] { display: flex !important; justify-content: center !important; width: 100% !important; }
-div[data-testid="stImage"] > img { border-radius: 10px !important; border: 1px solid var(--border) !important; width: 100% !important; height: auto !important; object-fit: cover !important; }
+/* Imagem centralizada, responsiva e com moldura escura para destacar imagens de fundo branco */
+div[data-testid="stImage"] { 
+    display: flex !important; justify-content: center !important; width: 100% !important; 
+    background: #0F172A; padding: 1rem; border-radius: 12px; 
+    box-shadow: 0 8px 24px -4px rgba(15,23,42,0.25); 
+}
+div[data-testid="stImage"] > img { 
+    border-radius: 8px !important; border: none !important; width: 100% !important; 
+    height: auto !important; object-fit: cover !important; 
+    box-shadow: 0 0 20px rgba(0,0,0,0.4) !important; background: transparent; 
+}
 
-/* Ajuste hierárquico das Métricas do MLOps */
-div[data-testid="stMetricValue"] { font-size: 1.5rem !important; font-weight: 600; letter-spacing: -0.02em; }
-div[data-testid="stMetricLabel"] { font-size: 0.9rem !important; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+/* Ajuste hierárquico das Métricas do MLOps (mais denso e destacado) */
+div[data-testid="stMetricValue"] { 
+    font-size: 1.45rem !important; font-weight: 700; color: var(--primary-dark); letter-spacing: -0.02em;
+    background: #ECFDF5; padding: 0.15rem 0.6rem; border-radius: 6px; display: inline-block;
+    border: 1px solid #A7F3D0; box-shadow: inset 0 1px 2px rgba(4,120,87,0.1);
+    font-family: 'JetBrains Mono', monospace !important;
+}
+div[data-testid="stMetricLabel"] { font-size: 0.8rem !important; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: #334155; }
 

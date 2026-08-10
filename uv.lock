@@ -397,6 +397,8 @@ dependencies = [
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "streamlit" },
+    { name = "streamlit-image-comparison" },
+    { name = "streamlit-image-zoom" },
     { name = "tensorflow" },
     { name = "tqdm" },
 ]
@@ -420,6 +422,8 @@ requires-dist = [
     { name = "scikit-learn", specifier = ">=1.9.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "streamlit", specifier = ">=1.60.0" },
+    { name = "streamlit-image-comparison", specifier = ">=0.0.4" },
+    { name = "streamlit-image-zoom", specifier = ">=0.0.4" },
     { name = "tensorflow", specifier = ">=2.21.0" },
     { name = "tqdm", specifier = ">=4.68.4" },
 ]
@@ -2800,6 +2804,34 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7a/46/fa437e9651af1dbe7e5b28a754fd9c36df656e4a14a2b5ecc1bcd1d90587/streamlit-1.60.0.tar.gz", hash = "sha256:09f2fdd2aabbd3b3560953795681dd675d5479ac82c21fc2dceadaf9bd484ea3", size = 9819884, upload-time = "2026-07-21T21:13:58.04Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2f/69/7a1984df015d01875c9ac79bfda7c31492cc94f81a2625303ce4707188e5/streamlit-1.60.0-py3-none-any.whl", hash = "sha256:d167d67cf94537600a6e378d8aa0c31eabab26beb243e2a51de9842e2872e393", size = 10419153, upload-time = "2026-07-21T21:13:55.113Z" },
+]
+
+[[package]]
+name = "streamlit-image-comparison"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pillow" },
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/68/bf/c163952ff3ccca0672474ac96e95c2e5abee7af63b9e49c194145e68ed05/streamlit-image-comparison-0.0.4.tar.gz", hash = "sha256:3932875978151eb89b65a2da5ca293fc15da12a322632214d96ce0146d9154b4", size = 6027, upload-time = "2023-03-14T14:25:43.46Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4b/eb/8c1f2f32f9fb201197ae8882e084b455356222ed5d9ba0f19c789e7a549e/streamlit_image_comparison-0.0.4-py3-none-any.whl", hash = "sha256:84bb4bc8c9e66fd7ab28fdcd76cf87f0f27941e7288160fb9832c9322bd1f085", size = 6301, upload-time = "2023-03-14T14:25:42.091Z" },
+]
+
+[[package]]
+name = "streamlit-image-zoom"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pillow" },
+    { name = "streamlit" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/54/b0/507c0802d07c539ba828f6ac5d258a45cf60112617937baed6729f1a4caa/streamlit_image_zoom-0.0.4.tar.gz", hash = "sha256:ebd613e1656fbfd83cf38536c0218dc776b805c7a20c5a372797962b04c2c616", size = 8514, upload-time = "2024-07-02T09:11:50.692Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f0/fd/8def9900e032ff72d6d982991cba0f6a4bf27148f911faede96ffc0ef801/streamlit_image_zoom-0.0.4-py3-none-any.whl", hash = "sha256:6e0a763c52729f452bd3bc2ea22eff1fa090bdb6cfa3c3f7141b8f9c1db11c28", size = 7917, upload-time = "2024-07-02T09:11:49.506Z" },
 ]
 
 [[package]]

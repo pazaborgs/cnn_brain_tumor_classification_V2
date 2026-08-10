@@ -9,6 +9,10 @@ Suporta modos de execução via linha de comando (CLI):
 
 import argparse
 import os
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 import subprocess
 import sys
 

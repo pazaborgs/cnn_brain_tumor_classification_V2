@@ -15,17 +15,21 @@ def inject_css_from_file(css_file_path: str = "src/ui/styles.css"):
         st.error(f"Arquivo CSS não encontrado em {css_file_path}")
 
 
-def window(title: str, icon: str = "folder"):
+def window(title: str, icon: str = "folder", height: int = None):
     """Cria um container estilizado no formato de janela com cabeçalho limpo.
 
     Args:
         title (str): Título da janela a ser exibido.
         icon (str): Nome do ícone do Google Material Symbols.
+        height (int, opcional): Altura fixa em pixels.
 
     Returns:
         st.container: O contexto do container do Streamlit.
     """
-    container = st.container(border=True)
+    kwargs = {"border": True}
+    if height is not None:
+        kwargs["height"] = height
+    container = st.container(**kwargs)
     with container:
         st.markdown(
             f"""

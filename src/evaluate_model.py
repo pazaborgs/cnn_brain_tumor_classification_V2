@@ -24,15 +24,31 @@ from src.utils.load_config import load_config
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-sns.set_theme(style="whitegrid", font="sans-serif")
+sns.set_theme(style="whitegrid", font="monospace")
 plt.rcParams.update(
     {
+        "font.family": "monospace",
         "font.size": 11,
-        "axes.titlesize": 13,
+        "axes.titlesize": 14,
+        "axes.titleweight": "bold",
         "axes.labelsize": 11,
+        "axes.facecolor": "#FFFFFF",
+        "axes.edgecolor": "#CBD5E1",
+        "axes.labelcolor": "#0F172A",
         "xtick.labelsize": 10,
+        "xtick.color": "#334155",
         "ytick.labelsize": 10,
-        "figure.titlesize": 14,
+        "ytick.color": "#334155",
+        "figure.facecolor": "#F8FAFC",
+        "figure.titlesize": 15,
+        "text.color": "#0F172A",
+        "grid.color": "#E2E8F0",
+        "grid.alpha": 0.8,
+        "legend.facecolor": "#FFFFFF",
+        "legend.edgecolor": "#CBD5E1",
+        "legend.fontsize": 10,
+        "savefig.facecolor": "#F8FAFC",
+        "savefig.edgecolor": "#F8FAFC",
     }
 )
 
@@ -168,23 +184,35 @@ def plot_confusion_matrix(
     Returns:
         plt.Figure: Objeto Figure do Matplotlib contendo a matriz de confusão plotada.
     """
+    from matplotlib.colors import LinearSegmentedColormap
+
     cm = confusion_matrix(y_true, y_pred)
 
-    fig, ax = plt.subplots(figsize=(8, 6.5), dpi=150)
-    cm_display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=class_names)
-
-    cm_display.plot(
-        cmap="Blues",
-        ax=ax,
-        values_format="d",
-        colorbar=True,
-        xticks_rotation=20,
+    # Colormap custom alinhado com a paleta do projeto (branco -> emerald)
+    project_cmap = LinearSegmentedColormap.from_list(
+        "project", ["#F0FDF4", "#A7F3D0", "#34D399", "#059669", "#047857"]
     )
 
-    ax.set_title(title, fontsize=13, pad=12, fontweight="bold")
-    ax.set_xlabel("Classes Preditas pelo Modelo", fontsize=11, labelpad=8)
-    ax.set_ylabel("Classes Reais (Ground Truth)", fontsize=11, labelpad=8)
-    ax.grid(False)
+    fig, ax = plt.subplots(figsize=(8, 6.5), dpi=150)
+    sns.heatmap(
+        cm,
+        annot=True,
+        fmt="d",
+        cmap=project_cmap,
+        xticklabels=class_names,
+        yticklabels=class_names,
+        linewidths=1.5,
+        linecolor="#F8FAFC",
+        cbar_kws={"shrink": 0.8},
+        annot_kws={"size": 13, "weight": "bold"},
+        ax=ax,
+    )
+
+    ax.set_title(title, fontsize=14, pad=14, fontweight="bold", color="#0F172A")
+    ax.set_xlabel("Classes Preditas pelo Modelo", fontsize=11, labelpad=10, color="#334155")
+    ax.set_ylabel("Classes Reais (Ground Truth)", fontsize=11, labelpad=10, color="#334155")
+    ax.tick_params(axis="x", rotation=20, colors="#334155")
+    ax.tick_params(axis="y", rotation=0, colors="#334155")
 
     plt.tight_layout()
 

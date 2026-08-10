@@ -19,6 +19,8 @@ dependencies = [
     "streamlit>=1.60.0",
     "tensorflow>=2.21.0",
     "tqdm>=4.68.4",
+    "streamlit-image-zoom>=0.0.4",
+    "streamlit-image-comparison>=0.0.4",
 ]
 
 [dependency-groups]

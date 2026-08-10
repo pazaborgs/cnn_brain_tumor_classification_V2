@@ -27,10 +27,14 @@ def render_comparison_tab(
         st.info("Selecione uma imagem de amostra no Painel de Controle.", icon=":material/info:")
         return
 
+    default_models = [m for m in models_list if m in ["inception_v3", "efficientnet_b0"]]
+    if not default_models:
+        default_models = models_list[:2]
+        
     compare_models = st.multiselect(
         "Selecione as arquiteturas para comparação direta:",
         options=models_list,
-        default=models_list,
+        default=default_models,
         key="compare_models_tab2",
     )
 

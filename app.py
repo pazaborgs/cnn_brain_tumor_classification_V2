@@ -5,12 +5,19 @@ Design de alto desempenho com inferência ao vivo e suporte a IA Explicável (Gr
 arquitetura modularizada (componentes em src/ui) e compatibilidade com Streamlit atualizada.
 """
 
+import os
 import time
 from pathlib import Path
 
 import numpy as np
 import PIL.Image
 import streamlit as st
+
+# Ocultar logs verbosos de CPU/GPU do TensorFlow e resolver aviso de imagem longa (DecompressionBombWarning)
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+PIL.Image.MAX_IMAGE_PIXELS = None
+
 import tensorflow as tf
 
 from src.gradcam import make_gradcam_heatmap, overlay_gradcam
@@ -30,7 +37,7 @@ st.set_page_config(
     page_title="Brain Tumor MRI Classification",
     page_icon=":material/neurology:",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 
@@ -60,7 +67,7 @@ def get_last_conv_layer_name(config: dict, model_name: str) -> str | None:
     return None
 
 
-@st.cache_resource(show_spinner=True)
+@st.cache_resource(show_spinner=True, max_entries=2)
 def load_trained_model(model_name: str):
     """Carrega o modelo Keras localmente ou faz download automático do Hugging Face Hub.
 
@@ -220,6 +227,7 @@ def main():
             options=models_list,
             index=default_model_index,
             label_visibility="collapsed",
+            help="Alterne entre os diferentes modelos de IA treinados para comparar seus laudos e diagnósticos.",
         )
         groupbox_end()
 
@@ -231,6 +239,7 @@ def main():
                 "Selecione uma imagem de teste",
                 options=list(sample_options.keys()),
                 label_visibility="collapsed",
+                help="Selecione o caso clínico (paciente) que deseja analisar. As abas carregarão o resultado instantaneamente.",
             )
             sample_path = sample_options[selected_sample_key]
         else:
