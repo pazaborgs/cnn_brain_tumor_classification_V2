@@ -151,27 +151,27 @@ Resultados consolidados da Segunda Leva (Avaliação no Conjunto de Teste isolad
 
 *Nota Analítica:* A `cnn_custom`, por ser uma rede desenvolvida e treinada estritamente do zero (*from scratch*), sofreu limitações graves na taxa de acerto nesta segunda rodada. Sem a bagagem pré-treinada do ImageNet, ela exigiria um banco de dados substancialmente maior e rodadas massivas de *Data Augmentation* para competir, validando empiricamente a escolha primordial por *Transfer Learning* no uso de imagens médicas de pequeno volume.
 
-### 2.5. Histórico e Decisões Finais de Hiperparâmetros (`config.yaml` e Arquitetura)
+### 2.5. Histórico e Decisões de Hiperparâmetros (`config.yaml` e Arquitetura)
 
-Durante o desenvolvimento, cometemos erros que nos ensinaram bastante sobre as particularidades de imagens médicas. A seguir, conto um pouco das nossas principais lutas e como chegamos às decisões finais:
+Durante o desenvolvimento, cometi erros que me ensinaram bastante sobre as particularidades de imagens médicas. A seguir, registro os principais desafios e como cheguei às decisões finais:
 
-#### A Queda de Performance com o Batch Normalization
-Inicialmente, na fase de *Fine-tuning*, mantivemos as camadas de `BatchNormalization` congeladas. Isso é o padrão ensinado na maioria dos tutoriais de Transfer Learning para fotos normais (cachorros, carros). No entanto, quando fomos avaliar os modelos (InceptionV3 e EfficientNet), a acurácia despencou. O motivo? As estatísticas visuais (luminosidade e contraste) de uma ressonância magnética (MRI) são radicalmente diferentes das fotos da base ImageNet. As camadas congeladas tentavam normalizar cérebros usando a média de cor de gatos e cachorros. **Decisão:** Passamos a descongelar as camadas de BatchNorm no fine-tuning. A rede imediatamente voltou a aprender.
+#### Problema com Batch Normalization
+Inicialmente, na fase de *Fine-tuning*, mantive as camadas de `BatchNormalization` congeladas. Esse é o padrão ensinado na maioria dos tutoriais de Transfer Learning para fotos normais (cachorros, carros). No entanto, quando fui avaliar os modelos (InceptionV3 e EfficientNet), a acurácia despencou. O motivo? As estatísticas visuais (luminosidade e contraste) de uma ressonância magnética (MRI) são radicalmente diferentes das fotos da base ImageNet. As camadas congeladas tentavam normalizar cérebros usando a média de cor de gatos e cachorros. **Decisão:** Passei a descongelar as camadas de BatchNorm no fine-tuning. A rede imediatamente voltou a aprender.
 
-#### A Batalha com a Interface de Precisão Mista (FP16)
-Ativamos o Mixed Precision (cálculos em 16-bits) para treinar mais rápido e economizar memória na GPU. Funcionou bem, mas esbarramos em instabilidade numérica (NaN loss) no modelo `EfficientNet`. Descobrimos que, ao lidar com a camada de saída (`Softmax`), as probabilidades matemáticas exigem altíssima precisão. **Decisão:** Adicionamos explicitamente `dtype="float32"` na última camada Densa para forçar o Softmax a operar em precisão máxima, estabilizando as gradientes sem perder velocidade.
+#### Erro de Precisão Mista (FP16)
+Ativei o Mixed Precision (cálculos em 16-bits) para treinar mais rápido e economizar memória na GPU. Funcionou bem, mas esbarrei em instabilidade numérica (NaN loss) no modelo `EfficientNet`. Descobri que, ao lidar com a camada de saída (`Softmax`), as probabilidades matemáticas exigem altíssima precisão. **Decisão:** Adicionei explicitamente `dtype="float32"` na última camada Densa para forçar o Softmax a operar em precisão máxima, estabilizando os gradientes sem perder velocidade.
 
-#### Dificuldade Intrínseca: Glioma vs. Hipófise
-Ao longo dos treinamentos, notamos uma confusão frequente do modelo entre Gliomas e Tumores de Hipófise. Isso é intrínseco aos dados: gliomas costumam ter bordas muito difusas e irregulares (se misturando ao cérebro), enquanto os de hipófise ficam numa região anatômica muito específica (Sela Túrcica). 
+#### Shortcut Learning: Glioma vs. Hipófise
+Ao longo dos treinamentos, notei uma confusão frequente do modelo entre Gliomas e Tumores de Hipófise. Isso é intrínseco aos dados: gliomas costumam ter bordas muito difusas e irregulares (se misturando ao cérebro), enquanto os de hipófise ficam numa região anatômica muito específica (Sela Túrcica). 
 
-Ao investigar o mapa de calor (Grad-CAM), percebemos um erro crasso: o modelo estava sofrendo de **Shortcut Learning** (aprendizado por atalho). Em vez de olhar para a glândula no centro do cérebro, a rede decorou o contorno do crânio nas extremidades laterais das imagens de hipófise (provavelmente um artefato das máquinas de raio-x daquele dataset).
+Ao investigar o mapa de calor (Grad-CAM), percebi um erro grave: o modelo estava sofrendo de **Shortcut Learning** (aprendizado por atalho). Em vez de olhar para a glândula no centro do cérebro, a rede decorou o contorno do crânio nas extremidades laterais das imagens de hipófise (provavelmente um artefato das máquinas de raio-x daquele dataset).
 
-Para curar o modelo desses "atalhos" adotamos duas táticas agressivas:
-1. **Remoção de Bordas (Zoom-In Forçado):** Configuramos o `zoom_range` no Keras Data Augmentation para `[-0.15, -0.05]`. Isso obriga a rede a dar um corte de 5% a 15% nas laterais de *todas* as imagens de treino, cortando o crânio e forçando o foco no tecido interno.
-2. **Weight Decay (Regularização L2):** Injetamos `kernel_regularizer=l2(0.01)` nas camadas Densas finais. Isso penaliza pesos excessivamente altos, impedindo que a IA confie em apenas dois ou três "pixels fáceis" na ponta da tela. A matemática a obriga a espalhar a atenção por toda a textura, o que ajudou brutalmente na leitura difusa dos Gliomas.
+Para curar o modelo desses "atalhos", adotei duas táticas:
+1. **Remoção de Bordas (Zoom-In Forçado):** Configurei o `zoom_range` no Keras Data Augmentation para `[-0.15, -0.05]`. Isso obriga a rede a dar um corte de 5% a 15% nas laterais de *todas* as imagens de treino, escondendo o crânio e forçando o foco no tecido interno.
+2. **Weight Decay (Regularização L2):** Injetei `kernel_regularizer=l2(0.01)` nas camadas Densas finais. Isso penaliza pesos excessivamente altos, impedindo que a IA confie em apenas dois ou três "pixels fáceis" na ponta da tela. A matemática a obriga a espalhar a atenção por toda a textura, o que ajudou na leitura difusa dos Gliomas.
 
-#### Matriz Final de Hiperparâmetros
-Após todas as batalhas acima, este foi o consenso que entregou resiliência sem *overfitting*:
+#### Configurações Finais
+Após os ajustes acima, este foi o consenso que entregou resiliência sem *overfitting*:
 
 ```yaml
 training:
@@ -186,4 +186,4 @@ augmentation:
   zoom_range: [-0.15, -0.05] # Esconde o crânio
   width_shift_range: 0.15    # Balanço lateral agressivo
 ```
-Essas configurações, aliadas ao pipeline eficiente do `tf.data`, permitiram extrair o máximo de um dataset complexo, desafiador e com forte ruído anatômico.
+Essas configurações, aliadas ao pipeline do `tf.data`, me permitiram extrair o máximo de um dataset complexo, desafiador e com forte ruído anatômico.
