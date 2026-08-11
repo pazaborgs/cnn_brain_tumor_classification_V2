@@ -47,16 +47,16 @@ models:
     last_conv_layer: mixed10
     fine_tune_from: 40
     stage1_epochs: 10
-    stage2_lr: 0.00001
+    stage2_lr: 0.0001
   - name: efficientnet_b0
     image_size: 224
     preprocessing: efficientnet
     last_conv_layer: top_activation
     fine_tune_from: 30
     stage1_epochs: 10
-    stage2_lr: 0.00001
+    stage2_lr: 0.0001
 
-# --- Legado (desativados para otimização de memória no Streamlit Cloud) ---
+# --- desativados para otimização de memória no Streamlit Cloud ---
 # - name: cnn_custom
 #   image_size: 128
 #   preprocessing: rescale

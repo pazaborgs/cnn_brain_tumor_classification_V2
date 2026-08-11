@@ -79,7 +79,7 @@ def augmentation_block(aug_config: dict) -> tf.keras.Sequential:
 
 
 # ---------------------------------------------------------------------------
-# Legado: CNN Custom Backbone (desativada do pipeline ativo)
+# CNN Custom Backbone (desativada do pipeline ativo)
 # ---------------------------------------------------------------------------
 # def build_cnn_custom_backbone() -> tf.keras.Model:
 #     """Constrói uma arquitetura CNN convolucional otimizada com blocos duplos de convolução.
@@ -157,7 +157,8 @@ def backbone(model_name: str) -> tf.keras.layers.Layer:
         )
         base.trainable = False
         return base
-    # --- Legado (desativados do pipeline ativo) ---
+
+    # --- Modelos desativados do pipeline ativo ---
     # elif model_name == "cnn_custom":
     #     return build_cnn_custom_backbone()
     # elif model_name == "densenet121":
@@ -174,9 +175,10 @@ def backbone(model_name: str) -> tf.keras.layers.Layer:
 def unfreeze_backbone(model: tf.keras.Model, fine_tune_from: int) -> None:
     """Descongela as últimas N camadas do backbone para fine-tuning (Stage 2).
 
-    Mantém as camadas de BatchNormalization congeladas para preservar as
-    estatísticas de normalização pré-treinadas no ImageNet, evitando colapso
-    de ativação em datasets médicos pequenos.
+    Diferente de tarefas em fotos comuns, para imagens médicas (MRI), 
+    as camadas de BatchNormalization nas últimas N camadas devem ser 
+    descongeladas para aprenderem as novas estatísticas de contraste 
+    e luminosidade do cérebro.
 
     Args:
         model: Modelo Keras completo contendo o backbone como sub-model.
@@ -187,11 +189,8 @@ def unfreeze_backbone(model: tf.keras.Model, fine_tune_from: int) -> None:
             layer.trainable = True
             for sublayer in layer.layers[:-fine_tune_from]:
                 sublayer.trainable = False
-            for sublayer in layer.layers:
-                if isinstance(sublayer, tf.keras.layers.BatchNormalization):
-                    sublayer.trainable = False
             trainable_count = sum(1 for l in layer.layers if l.trainable)
-            print(f"[INFO] Backbone '{layer.name}': {trainable_count} camadas descongeladas (BN congelada)")
+            print(f"[INFO] Backbone '{layer.name}': {trainable_count} camadas descongeladas")
             break
 
 
@@ -238,6 +237,7 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
         num_classes,
         activation="softmax",
         name="output_layer",
+        dtype="float32",
     )(x)
 
     model = tf.keras.Model(
@@ -265,7 +265,9 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
 
     print(f"[SUCESSO] Modelo '{model.name}' compilado.")
     print(f"[INFO] Parâmetros totais: {model.count_params():,}")
-    print(f"[INFO] Optimizer: {train_cfg['optimizer']} | Label Smoothing: {label_smoothing}")
+    print(
+        f"[INFO] Optimizer: {train_cfg['optimizer']} | Label Smoothing: {label_smoothing}"
+    )
 
     figures_path = Path(config["paths"]["figures"])
     figures_path.mkdir(parents=True, exist_ok=True)
