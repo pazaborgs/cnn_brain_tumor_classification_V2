@@ -13,7 +13,6 @@ import numpy as np
 import seaborn as sns
 import tensorflow as tf
 from sklearn.metrics import (
-    ConfusionMatrixDisplay,
     classification_report,
     confusion_matrix,
 )
@@ -188,7 +187,6 @@ def plot_confusion_matrix(
 
     cm = confusion_matrix(y_true, y_pred)
 
-    # Colormap custom alinhado com a paleta do projeto (branco -> emerald)
     project_cmap = LinearSegmentedColormap.from_list(
         "project", ["#F0FDF4", "#A7F3D0", "#34D399", "#059669", "#047857"]
     )
@@ -209,8 +207,12 @@ def plot_confusion_matrix(
     )
 
     ax.set_title(title, fontsize=14, pad=14, fontweight="bold", color="#0F172A")
-    ax.set_xlabel("Classes Preditas pelo Modelo", fontsize=11, labelpad=10, color="#334155")
-    ax.set_ylabel("Classes Reais (Ground Truth)", fontsize=11, labelpad=10, color="#334155")
+    ax.set_xlabel(
+        "Classes Preditas pelo Modelo", fontsize=11, labelpad=10, color="#334155"
+    )
+    ax.set_ylabel(
+        "Classes Reais (Ground Truth)", fontsize=11, labelpad=10, color="#334155"
+    )
     ax.tick_params(axis="x", rotation=20, colors="#334155")
     ax.tick_params(axis="y", rotation=0, colors="#334155")
 
@@ -258,7 +260,9 @@ def evaluate_model(
     model_file = models_path / f"{model_name}.keras"
 
     if not model_file.exists():
-        print(f"[ERRO] Modelo {model_file} não encontrado. Execute train_model.py primeiro.")
+        print(
+            f"[ERRO] Modelo {model_file} não encontrado. Execute train_model.py primeiro."
+        )
         raise FileNotFoundError(f"Arquivo do modelo {model_file} não encontrado.")
 
     print(f"[INFO] Avaliando modelo '{model_name}' no conjunto de Teste...")
@@ -342,7 +346,9 @@ def evaluate_model(
     macro_f1 = float(report_dict["macro avg"]["f1-score"])
 
     print(f"[SUCESSO] Avaliação do modelo '{model_name}' concluída.")
-    print(f"[INFO] Test Accuracy: {test_acc:.2%} | Test Loss: {test_loss:.4f} | Macro F1: {macro_f1:.4f}")
+    print(
+        f"[INFO] Test Accuracy: {test_acc:.2%} | Test Loss: {test_loss:.4f} | Macro F1: {macro_f1:.4f}"
+    )
     print(f"[INFO] Matriz de Confusão salva em: {cm_save_path}")
 
     return {

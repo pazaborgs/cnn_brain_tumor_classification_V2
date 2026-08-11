@@ -76,7 +76,9 @@ def make_gradcam_heatmap(
                 pass
 
         if target_layer is None:
-            print(f"[ERRO] Grad-CAM: Camada alvo '{last_conv_layer_name}' não encontrada na arquitetura.")
+            print(
+                f"[ERRO] Grad-CAM: Camada alvo '{last_conv_layer_name}' não encontrada na arquitetura."
+            )
             return None
 
         img_tensor = tf.convert_to_tensor(img_array, dtype=tf.float32)
@@ -94,13 +96,19 @@ def make_gradcam_heatmap(
                     if l.name not in ("input_layer", "augmentation"):
                         x_prep = l(x_prep)
 
-                conv_outputs, backbone_pooled = backbone_grad_model(x_prep, training=False)
+                conv_outputs, backbone_pooled = backbone_grad_model(
+                    x_prep, training=False
+                )
                 tape.watch(conv_outputs)
 
                 x = backbone_pooled
                 backbone_idx = model.layers.index(backbone)
                 for l in model.layers[backbone_idx + 1 :]:
-                    x = l(x, training=False) if 'training' in l.call.__code__.co_varnames else l(x)
+                    x = (
+                        l(x, training=False)
+                        if "training" in l.call.__code__.co_varnames
+                        else l(x)
+                    )
                 preds = x
 
                 if pred_index is None:
@@ -127,7 +135,11 @@ def make_gradcam_heatmap(
             heatmap = heatmap / max_val
 
         heatmap_np = heatmap.numpy()
-        threshold = np.percentile(heatmap_np[heatmap_np > 0], 15) if np.any(heatmap_np > 0) else 0
+        threshold = (
+            np.percentile(heatmap_np[heatmap_np > 0], 15)
+            if np.any(heatmap_np > 0)
+            else 0
+        )
         heatmap_np[heatmap_np < threshold] = 0
 
         return heatmap_np

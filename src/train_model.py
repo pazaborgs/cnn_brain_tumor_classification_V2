@@ -62,7 +62,7 @@ def train_model(
     print(f"[INFO] Stage 1: {stage1_epochs} epochs (LR={train_cfg['learning_rate']})")
     print(f"[INFO] Stage 2: {stage2_epochs} epochs (LR={stage2_lr})")
 
-    # Mixed Precision para acelerar em GPUs T4/A100
+    # Mixed Precision
     try:
         tf.keras.mixed_precision.set_global_policy("mixed_float16")
         print("[INFO] Mixed Precision (FP16) ativado.")
@@ -99,9 +99,10 @@ def train_model(
         mlflow.log_param("fine_tune_from", fine_tune_from)
 
         # ===== STAGE 1: Feature Extraction (backbone congelado) =====
-        print(f"\n{'='*60}")
-        print(f"  STAGE 1 — Feature Extraction (Head-Only)")
-        print(f"{'='*60}")
+
+        print(f"\n{'=' * 60}")
+        print("  STAGE 1 — Feature Extraction (Head-Only)")
+        print(f"{'=' * 60}")
 
         callbacks_s1 = [
             tf.keras.callbacks.EarlyStopping(
@@ -130,9 +131,10 @@ def train_model(
         print(f"[INFO] Stage 1 concluído — Best Val Accuracy: {best_s1_acc:.2%}")
 
         # ===== STAGE 2: Fine-tuning (backbone parcialmente descongelado) =====
-        print(f"\n{'='*60}")
+
+        print(f"\n{'=' * 60}")
         print(f"  STAGE 2 — Fine-tuning Discriminativo (Top {fine_tune_from} layers)")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         unfreeze_backbone(model, fine_tune_from)
 
@@ -169,27 +171,42 @@ def train_model(
         )
 
         # Combinar históricos para plots unificados
+
         combined_history_dict = {}
         for key in history_s1.history:
-            combined_history_dict[key] = history_s1.history[key] + history_s2.history.get(key, [])
+            combined_history_dict[key] = history_s1.history[
+                key
+            ] + history_s2.history.get(key, [])
 
         class CombinedHistory:
             """Container para histórico combinado de 2 estágios."""
+
             def __init__(self, hist_dict):
                 self.history = hist_dict
 
         combined_history = CombinedHistory(combined_history_dict)
 
-        # Métricas finais
+        # Métricas
+
         if "val_loss" in combined_history.history:
             best_epoch_idx = int(np.argmin(combined_history.history["val_loss"]))
-            mlflow.log_metric("train_loss", combined_history.history["loss"][best_epoch_idx])
-            mlflow.log_metric("train_accuracy", combined_history.history["accuracy"][best_epoch_idx])
-            mlflow.log_metric("val_loss", combined_history.history["val_loss"][best_epoch_idx])
-            mlflow.log_metric("val_accuracy", combined_history.history["val_accuracy"][best_epoch_idx])
+            mlflow.log_metric(
+                "train_loss", combined_history.history["loss"][best_epoch_idx]
+            )
+            mlflow.log_metric(
+                "train_accuracy", combined_history.history["accuracy"][best_epoch_idx]
+            )
+            mlflow.log_metric(
+                "val_loss", combined_history.history["val_loss"][best_epoch_idx]
+            )
+            mlflow.log_metric(
+                "val_accuracy", combined_history.history["val_accuracy"][best_epoch_idx]
+            )
         else:
             mlflow.log_metric("train_loss", combined_history.history["loss"][-1])
-            mlflow.log_metric("train_accuracy", combined_history.history["accuracy"][-1])
+            mlflow.log_metric(
+                "train_accuracy", combined_history.history["accuracy"][-1]
+            )
 
         model_path = models_path / f"{model.name}.keras"
         model.save(model_path)
@@ -225,9 +242,15 @@ def train_model(
         )
 
         total_epochs = len(combined_history.history["loss"])
-        print(f"\n[SUCESSO] Treinamento do modelo '{model.name}' finalizado com sucesso.")
-        print(f"[INFO] Épocas Totais: {total_epochs} (S1: {len(history_s1.history['loss'])} + S2: {len(history_s2.history['loss'])})")
-        print(f"[INFO] Best Val Accuracy: {best_acc:.2%} | Best Val Loss: {best_loss:.4f}")
+        print(
+            f"\n[SUCESSO] Treinamento do modelo '{model.name}' finalizado com sucesso."
+        )
+        print(
+            f"[INFO] Épocas Totais: {total_epochs} (S1: {len(history_s1.history['loss'])} + S2: {len(history_s2.history['loss'])})"
+        )
+        print(
+            f"[INFO] Best Val Accuracy: {best_acc:.2%} | Best Val Loss: {best_loss:.4f}"
+        )
         print(f"[INFO] Modelo salvo em: {model_path}")
 
         try:
@@ -241,7 +264,7 @@ def train_model(
         except Exception as e:
             print(f"[ERRO] Não foi possível executar avaliação automática: {e}")
 
-    # Resetar Mixed Precision para não afetar outras operações
+    # Mixed Precision Reset (para evitar problemas em outros treinos subsequentes)
     try:
         tf.keras.mixed_precision.set_global_policy("float32")
     except Exception:
