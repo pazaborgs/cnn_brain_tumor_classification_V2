@@ -16,7 +16,7 @@ Projeto focado no diagnóstico de tumores cerebrais a partir de exames de resson
 Acesse a aplicação em tempo real hospedada no **Streamlit Cloud**:  
 👉 **[https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/](https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/)**
 
-![Brain Tumor Classification V2 Streamlit Demo](artifacts/figures/git_landing_page.gif)
+![Brain Tumor Classification V2 Streamlit Demo](artifacts/figures/git_landing_page_v2.gif)
 
 - **Model Registry em Nuvem:** Os binários dos modelos `.keras` são baixados automaticamente do [Hugging Face Hub](https://huggingface.co/pazaborgs/brain_tumor_classification_V2) sob demanda.
 - **Amostras Integradas:** Inclui 12 exames de ressonância magnética de amostra (3 por classe) integrados para teste imediato.
