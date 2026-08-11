@@ -41,7 +41,6 @@ st.set_page_config(
 )
 
 
-@st.cache_resource(show_spinner=True)
 def load_app_config() -> dict:
     """Carrega o arquivo de configuração YAML global.
 
@@ -67,7 +66,7 @@ def get_last_conv_layer_name(config: dict, model_name: str) -> str | None:
     return None
 
 
-@st.cache_resource(show_spinner=True, max_entries=2)
+@st.cache_resource(show_spinner=True, max_entries=1)
 def load_trained_model(model_name: str):
     """Carrega o modelo Keras localmente ou faz download automático do Hugging Face Hub.
 
@@ -118,7 +117,6 @@ def preprocess_image_for_model(pil_img: PIL.Image.Image, target_image_size: int)
     return img_rgb, img_tensor
 
 
-@st.cache_data(show_spinner=True)
 def run_prediction(
     model_name: str,
     image_path_str: str,
@@ -210,7 +208,7 @@ def main():
 
     render_app_titlebar()
 
-    models_list = [m["name"] for m in config.get("models", [])]
+    models_list = ["inception_v3",]
     default_model_index = (
         models_list.index("inception_v3") if "inception_v3" in models_list else 0
     )
