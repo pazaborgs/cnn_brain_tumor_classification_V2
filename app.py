@@ -122,6 +122,7 @@ def preprocess_image_for_model(pil_img: PIL.Image.Image, target_image_size: int)
     return img_rgb, img_tensor
 
 
+@st.cache_data(show_spinner=False, max_entries=20)
 def run_prediction(
     model_name: str,
     image_path_str: str,
@@ -213,7 +214,9 @@ def main():
 
     render_app_titlebar()
 
-    models_list = ["inception_v3",]
+    models_list = [
+        m["name"] for m in config.get("models", []) if m.get("enabled", True)
+    ]
     default_model_index = (
         models_list.index("inception_v3") if "inception_v3" in models_list else 0
     )
