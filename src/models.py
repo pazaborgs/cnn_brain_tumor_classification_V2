@@ -131,10 +131,9 @@ def augmentation_block(aug_config: dict) -> tf.keras.Sequential:
 
 
 def backbone(model_name: str) -> tf.keras.layers.Layer:
-    """Retorna o backbone extrator de características com todas as camadas congeladas (Stage 1).
-
-    O descongelamento seletivo para fine-tuning (Stage 2) é feito pela função
-    ``unfreeze_backbone`` após o Stage 1 de Feature Extraction.
+    """Retorna o backbone extrator de características congelado.
+    
+    O descongelamento para fine-tuning é feito posteriormente via `unfreeze_backbone`.
 
     Args:
         model_name (str): Nome do modelo ('inception_v3', 'efficientnet_b0').
@@ -173,12 +172,10 @@ def backbone(model_name: str) -> tf.keras.layers.Layer:
 
 
 def unfreeze_backbone(model: tf.keras.Model, fine_tune_from: int) -> None:
-    """Descongela as últimas N camadas do backbone para fine-tuning (Stage 2).
-
-    Diferente de tarefas em fotos comuns, para imagens médicas (MRI), 
-    as camadas de BatchNormalization nas últimas N camadas devem ser 
-    descongeladas para aprenderem as novas estatísticas de contraste 
-    e luminosidade do cérebro.
+    """Descongela as últimas N camadas do backbone.
+    
+    As camadas de BatchNormalization permanecem descongeladas para adaptação 
+    aos contrastes específicos de imagens médicas.
 
     Args:
         model: Modelo Keras completo contendo o backbone como sub-model.

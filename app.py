@@ -6,19 +6,26 @@ arquitetura modularizada (componentes em src/ui) e compatibilidade com Streamlit
 """
 
 import os
+import sys
 import time
+import warnings
+import gc
 from pathlib import Path
 
 import numpy as np
 import PIL.Image
 import streamlit as st
+import tensorflow as tf
+
+# Oculta warning deprecado do streamlit components
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", message=".*st.components.v1.html.*")
 
 # Ocultar logs verbosos de CPU/GPU do TensorFlow e resolver aviso de imagem longa (DecompressionBombWarning)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 PIL.Image.MAX_IMAGE_PIXELS = None
 
-import tensorflow as tf
 
 from src.gradcam import make_gradcam_heatmap, overlay_gradcam
 from src.ui.components.charts import CLASS_LABELS_PT, CLASS_NAMES
@@ -68,10 +75,7 @@ def get_last_conv_layer_name(config: dict, model_name: str) -> str | None:
 
 @st.cache_resource(show_spinner=True, max_entries=1)
 def load_trained_model(model_name: str):
-    """Carrega o modelo Keras localmente ou faz download automático do Hugging Face Hub.
-
-    Limpa a sessão Keras anterior para liberar memória antes de carregar
-    um novo modelo (crítico para o plano free do Streamlit Cloud).
+    """Carrega o modelo Keras. Limpa sessão para otimizar memória.
 
     Args:
         model_name (str): Nome do modelo a ser carregado.
@@ -80,6 +84,7 @@ def load_trained_model(model_name: str):
         keras.Model | None: A instância do modelo treinado ou None em caso de falha.
     """
     tf.keras.backend.clear_session()
+    gc.collect()
 
     model_path = Path(f"artifacts/models/{model_name}.keras")
     if not model_path.exists():
@@ -122,14 +127,14 @@ def preprocess_image_for_model(pil_img: PIL.Image.Image, target_image_size: int)
     return img_rgb, img_tensor
 
 
-@st.cache_data(show_spinner=False, max_entries=20)
+@st.cache_data(show_spinner=False, max_entries=3)
 def run_prediction(
     model_name: str,
     image_path_str: str,
     target_image_size: int,
     last_conv_layer_name: str,
 ):
-    """Executa a inferência Keras e gera a sobreposição Grad-CAM precisa em tempo real.
+    """Executa a inferência Keras e gera a sobreposição Grad-CAM.
 
     Args:
         model_name (str): Nome do modelo alvo.
