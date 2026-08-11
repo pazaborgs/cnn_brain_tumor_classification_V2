@@ -229,7 +229,7 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
     aug = augmentation_block(config["augmentation"])
     x = aug(x)
     x = backbone(model_config["name"])(x)
-    x = layers.Dense(128, activation="relu")(x)
+    x = layers.Dense(128, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
     x = layers.BatchNormalization()(x)
     x = layers.Dropout(0.5)(x)
 
@@ -238,6 +238,7 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
         activation="softmax",
         name="output_layer",
         dtype="float32",
+        kernel_regularizer=tf.keras.regularizers.l2(0.01)
     )(x)
 
     model = tf.keras.Model(
