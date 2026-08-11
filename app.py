@@ -70,12 +70,17 @@ def get_last_conv_layer_name(config: dict, model_name: str) -> str | None:
 def load_trained_model(model_name: str):
     """Carrega o modelo Keras localmente ou faz download automático do Hugging Face Hub.
 
+    Limpa a sessão Keras anterior para liberar memória antes de carregar
+    um novo modelo (crítico para o plano free do Streamlit Cloud).
+
     Args:
         model_name (str): Nome do modelo a ser carregado.
 
     Returns:
         keras.Model | None: A instância do modelo treinado ou None em caso de falha.
     """
+    tf.keras.backend.clear_session()
+
     model_path = Path(f"artifacts/models/{model_name}.keras")
     if not model_path.exists():
         config = load_app_config()

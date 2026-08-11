@@ -16,19 +16,20 @@ preprocessing:
 
 training:
   batch_size: 32
-  epochs: 30
-  learning_rate: 0.0003
+  epochs: 25
+  learning_rate: 0.001
   optimizer: adam
   loss_function: categorical_crossentropy
-  early_stopping_patience: 8
+  label_smoothing: 0.1
+  early_stopping_patience: 6
   reduce_lr_patience: 3
   reduce_lr_factor: 0.5
 
 augmentation:
-  rotation_range: 30
-  zoom_range: 0.1
-  width_shift_range: 0.1
-  height_shift_range: 0.1
+  rotation_range: 15
+  zoom_range: 0.08
+  width_shift_range: 0.08
+  height_shift_range: 0.08
   horizontal_flip: true
   vertical_flip: false
 
@@ -40,19 +41,27 @@ huggingface:
   repo_id: "pazaborgs/brain_tumor_classification_V2"
 
 models:
-  - name: cnn_custom
-    image_size: 128
-    preprocessing: rescale
-    last_conv_layer: last_feature_map
   - name: inception_v3
     image_size: 299
     preprocessing: inception_v3
     last_conv_layer: mixed10
+    fine_tune_from: 40
+    stage1_epochs: 10
+    stage2_lr: 0.00001
   - name: efficientnet_b0
     image_size: 224
     preprocessing: efficientnet
-    last_conv_layer: top_conv
-  - name: densenet121
-    image_size: 224
-    preprocessing: densenet
-    last_conv_layer: relu
+    last_conv_layer: top_activation
+    fine_tune_from: 30
+    stage1_epochs: 10
+    stage2_lr: 0.00001
+
+# --- Legado (desativados para otimização de memória no Streamlit Cloud) ---
+# - name: cnn_custom
+#   image_size: 128
+#   preprocessing: rescale
+#   last_conv_layer: last_feature_map
+# - name: densenet121
+#   image_size: 224
+#   preprocessing: densenet
+#   last_conv_layer: relu

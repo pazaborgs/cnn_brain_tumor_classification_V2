@@ -1,7 +1,8 @@
 """Módulo de Arquitetura e Construção de Modelos Keras 3.
 
-Define os extratores de características (CNN Customizada, InceptionV3, EfficientNetB0),
+Define os extratores de características (InceptionV3, EfficientNetB0),
 camadas de preprocessamento serializáveis e blocos de aumento de dados (Data Augmentation).
+Suporta treinamento em 2 estágios: Feature Extraction (backbone congelado) e Fine-tuning.
 """
 
 import sys
@@ -77,111 +78,121 @@ def augmentation_block(aug_config: dict) -> tf.keras.Sequential:
     return tf.keras.Sequential(aug_layers, name="augmentation")
 
 
-def build_cnn_custom_backbone() -> tf.keras.Model:
-    """Constrói uma arquitetura CNN convolucional otimizada com blocos duplos de convolução.
-
-    Utiliza a Functional API do Keras, permitindo resolução variável e fatiamento
-    nacional para XAI. Inicialização He Normal, Batch Normalization pós-convolução,
-    Dropout espacial progressivo e um mapa convolucional final de alta resolução.
-
-    Returns:
-        tf.keras.Model: Backbone convolucional customizado otimizado.
-    """
-    inputs = tf.keras.layers.Input(shape=(None, None, 3), name="input_layer")
-
-    x = layers.Conv2D(
-        32, 3, padding="same", kernel_initializer="he_normal", name="conv2d_1a"
-    )(inputs)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.Conv2D(
-        32, 3, padding="same", kernel_initializer="he_normal", name="conv2d_1b"
-    )(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.MaxPooling2D(2, 2)(x)
-    x = layers.Dropout(0.15)(x)
-
-    x = layers.Conv2D(
-        64, 3, padding="same", kernel_initializer="he_normal", name="conv2d_2a"
-    )(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.Conv2D(
-        64, 3, padding="same", kernel_initializer="he_normal", name="conv2d_2b"
-    )(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.MaxPooling2D(2, 2)(x)
-    x = layers.Dropout(0.25)(x)
-
-    x = layers.Conv2D(
-        128, 3, padding="same", kernel_initializer="he_normal", name="conv2d_3a"
-    )(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.Conv2D(
-        128, 3, padding="same", kernel_initializer="he_normal", name="conv2d_3b"
-    )(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.MaxPooling2D(2, 2)(x)
-    x = layers.Dropout(0.35)(x)
-
-    x = layers.Conv2D(
-        256, 3, padding="same", kernel_initializer="he_normal", name="last_feature_map"
-    )(x)
-    x = layers.BatchNormalization()(x)
-    x = layers.Activation("relu")(x)
-    x = layers.MaxPooling2D(2, 2)(x)
-    x = layers.Dropout(0.40)(x)
-
-    outputs = layers.GlobalAveragePooling2D()(x)
-
-    return tf.keras.Model(inputs=inputs, outputs=outputs, name="cnn_custom_backbone")
+# ---------------------------------------------------------------------------
+# Legado: CNN Custom Backbone (desativada do pipeline ativo)
+# ---------------------------------------------------------------------------
+# def build_cnn_custom_backbone() -> tf.keras.Model:
+#     """Constrói uma arquitetura CNN convolucional otimizada com blocos duplos de convolução.
+#
+#     Utiliza a Functional API do Keras, permitindo resolução variável e fatiamento
+#     nacional para XAI. Inicialização He Normal, Batch Normalization pós-convolução,
+#     Dropout espacial progressivo e um mapa convolucional final de alta resolução.
+#
+#     Returns:
+#         tf.keras.Model: Backbone convolucional customizado otimizado.
+#     """
+#     inputs = tf.keras.layers.Input(shape=(None, None, 3), name="input_layer")
+#
+#     x = layers.Conv2D(32, 3, padding="same", kernel_initializer="he_normal", name="conv2d_1a")(inputs)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.Conv2D(32, 3, padding="same", kernel_initializer="he_normal", name="conv2d_1b")(x)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.MaxPooling2D(2, 2)(x)
+#     x = layers.Dropout(0.15)(x)
+#
+#     x = layers.Conv2D(64, 3, padding="same", kernel_initializer="he_normal", name="conv2d_2a")(x)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.Conv2D(64, 3, padding="same", kernel_initializer="he_normal", name="conv2d_2b")(x)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.MaxPooling2D(2, 2)(x)
+#     x = layers.Dropout(0.25)(x)
+#
+#     x = layers.Conv2D(128, 3, padding="same", kernel_initializer="he_normal", name="conv2d_3a")(x)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.Conv2D(128, 3, padding="same", kernel_initializer="he_normal", name="conv2d_3b")(x)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.MaxPooling2D(2, 2)(x)
+#     x = layers.Dropout(0.35)(x)
+#
+#     x = layers.Conv2D(256, 3, padding="same", kernel_initializer="he_normal", name="last_feature_map")(x)
+#     x = layers.BatchNormalization()(x)
+#     x = layers.Activation("relu")(x)
+#     x = layers.MaxPooling2D(2, 2)(x)
+#     x = layers.Dropout(0.40)(x)
+#
+#     outputs = layers.GlobalAveragePooling2D()(x)
+#     return tf.keras.Model(inputs=inputs, outputs=outputs, name="cnn_custom_backbone")
 
 
 def backbone(model_name: str) -> tf.keras.layers.Layer:
-    """Retorna o backbone extrator de características.
+    """Retorna o backbone extrator de características com todas as camadas congeladas (Stage 1).
+
+    O descongelamento seletivo para fine-tuning (Stage 2) é feito pela função
+    ``unfreeze_backbone`` após o Stage 1 de Feature Extraction.
 
     Args:
-        model_name (str): Nome do modelo ('cnn_custom', 'inception_v3', 'efficientnet_b0', 'densenet121').
+        model_name (str): Nome do modelo ('inception_v3', 'efficientnet_b0').
 
     Returns:
-        tf.keras.layers.Layer: Camada ou modelo Keras para extração de features.
+        tf.keras.layers.Layer: Modelo Keras base com pesos ImageNet congelados.
 
     Raises:
         ValueError: Se o nome do modelo não for reconhecido.
     """
-    if model_name == "cnn_custom":
-        return build_cnn_custom_backbone()
-    elif model_name == "inception_v3":
+    if model_name == "inception_v3":
         base = tf.keras.applications.InceptionV3(
             include_top=False, weights="imagenet", pooling="avg"
         )
-        base.trainable = True
-        for layer in base.layers[:-40]:
-            layer.trainable = False
+        base.trainable = False
         return base
     elif model_name == "efficientnet_b0":
         base = tf.keras.applications.EfficientNetB0(
             include_top=False, weights="imagenet", pooling="avg"
         )
-        base.trainable = True
-        for layer in base.layers[:-30]:
-            layer.trainable = False
+        base.trainable = False
         return base
-    elif model_name == "densenet121":
-        base = tf.keras.applications.DenseNet121(
-            include_top=False, weights="imagenet", pooling="avg"
-        )
-        base.trainable = True
-        for layer in base.layers[:-40]:
-            layer.trainable = False
-        return base
+    # --- Legado (desativados do pipeline ativo) ---
+    # elif model_name == "cnn_custom":
+    #     return build_cnn_custom_backbone()
+    # elif model_name == "densenet121":
+    #     base = tf.keras.applications.DenseNet121(
+    #         include_top=False, weights="imagenet", pooling="avg"
+    #     )
+    #     base.trainable = False
+    #     return base
     else:
         print(f"[ERRO] Backbone desconhecido: {model_name}")
         raise ValueError(f"Modelo desconhecido: {model_name}")
+
+
+def unfreeze_backbone(model: tf.keras.Model, fine_tune_from: int) -> None:
+    """Descongela as últimas N camadas do backbone para fine-tuning (Stage 2).
+
+    Mantém as camadas de BatchNormalization congeladas para preservar as
+    estatísticas de normalização pré-treinadas no ImageNet, evitando colapso
+    de ativação em datasets médicos pequenos.
+
+    Args:
+        model: Modelo Keras completo contendo o backbone como sub-model.
+        fine_tune_from: Número de camadas finais do backbone a descongelar.
+    """
+    for layer in model.layers:
+        if hasattr(layer, "layers") and layer.name != "augmentation":
+            layer.trainable = True
+            for sublayer in layer.layers[:-fine_tune_from]:
+                sublayer.trainable = False
+            for sublayer in layer.layers:
+                if isinstance(sublayer, tf.keras.layers.BatchNormalization):
+                    sublayer.trainable = False
+            trainable_count = sum(1 for l in layer.layers if l.trainable)
+            print(f"[INFO] Backbone '{layer.name}': {trainable_count} camadas descongeladas (BN congelada)")
+            break
 
 
 def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.Model:
@@ -189,6 +200,7 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
 
     Empilha a camada de pré-processamento específica, o bloco de aumento de dados,
     o backbone selecionado e a cabeça de classificação totalmente conectada.
+    Usa label smoothing na loss para melhorar generalização.
 
     Args:
         config (dict): Dicionário de configuração global.
@@ -216,7 +228,7 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
 
     x = get_preprocessing_layer(model_config["preprocessing"])(inputs)
     aug = augmentation_block(config["augmentation"])
-    x = aug(x, training=True)
+    x = aug(x)
     x = backbone(model_config["name"])(x)
     x = layers.Dense(128, activation="relu")(x)
     x = layers.BatchNormalization()(x)
@@ -234,6 +246,8 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
         name=model_config["name"],
     )
 
+    label_smoothing = float(train_cfg.get("label_smoothing", 0.0))
+
     optimizer = tf.keras.optimizers.get(
         {
             "class_name": train_cfg["optimizer"],
@@ -245,13 +259,13 @@ def build_model(config: dict, model_config: dict, num_classes: int) -> tf.keras.
 
     model.compile(
         optimizer=optimizer,
-        loss=train_cfg["loss_function"],
+        loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=label_smoothing),
         metrics=["accuracy"],
     )
 
     print(f"[SUCESSO] Modelo '{model.name}' compilado.")
     print(f"[INFO] Parâmetros totais: {model.count_params():,}")
-    print(f"[INFO] Optimizer: {train_cfg['optimizer']} | Loss: {train_cfg['loss_function']}")
+    print(f"[INFO] Optimizer: {train_cfg['optimizer']} | Label Smoothing: {label_smoothing}")
 
     figures_path = Path(config["paths"]["figures"])
     figures_path.mkdir(parents=True, exist_ok=True)

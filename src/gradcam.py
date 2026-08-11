@@ -94,13 +94,13 @@ def make_gradcam_heatmap(
                     if l.name not in ("input_layer", "augmentation"):
                         x_prep = l(x_prep)
 
-                conv_outputs, backbone_pooled = backbone_grad_model(x_prep)
+                conv_outputs, backbone_pooled = backbone_grad_model(x_prep, training=False)
                 tape.watch(conv_outputs)
 
                 x = backbone_pooled
                 backbone_idx = model.layers.index(backbone)
                 for l in model.layers[backbone_idx + 1 :]:
-                    x = l(x)
+                    x = l(x, training=False) if 'training' in l.call.__code__.co_varnames else l(x)
                 preds = x
 
                 if pred_index is None:
@@ -126,7 +126,11 @@ def make_gradcam_heatmap(
         if max_val > 0:
             heatmap = heatmap / max_val
 
-        return heatmap.numpy()
+        heatmap_np = heatmap.numpy()
+        threshold = np.percentile(heatmap_np[heatmap_np > 0], 15) if np.any(heatmap_np > 0) else 0
+        heatmap_np[heatmap_np < threshold] = 0
+
+        return heatmap_np
     except Exception:
         return None
 
