@@ -1,20 +1,19 @@
-# 🧠 Classificação de Tumores Cerebrais em MRI via Deep Learning (V2)
+# Classificação de Tumores Cerebrais em MRI via Deep Learning
 
 [![Live Demo: Streamlit](https://img.shields.io/badge/Live%20Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/)
 [![Hugging Face Hub](https://img.shields.io/badge/Model%20Hub-Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/pazaborgs/brain_tumor_classification_V2)
-
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Framework: Keras 3 / TensorFlow](https://img.shields.io/badge/Framework-Keras%203%20%7C%20TensorFlow-FF6F00?style=flat&logo=tensorflow&logoColor=white)](https://keras.io/)
 [![MLOps: MLflow](https://img.shields.io/badge/MLOps-MLflow-0194E2?style=flat&logo=mlflow&logoColor=white)](https://mlflow.org/)
 [![Gerenciador: uv](https://img.shields.io/badge/Gerenciador-uv-DE5FE9?style=flat&logo=astral&logoColor=white)](https://astral.sh/uv)
 
-Projeto de aprendizado profundo focado no diagnóstico de tumores cerebrais a partir de exames de ressonância magnética (MRI). Esta segunda versão (V2) refatora o código acadêmico original em uma estrutura modular orientada a MLOps, integrada ao **Hugging Face Model Hub** e equipada com **IA Explicável (Grad-CAM)** em tempo real.
+Projeto focado no diagnóstico de tumores cerebrais a partir de exames de ressonância magnética (MRI). Esta versão refatora o código acadêmico original em uma estrutura modular orientada a MLOps, integrada ao **Hugging Face Model Hub** e equipada com interpretabilidade visual (**Grad-CAM**).
 
 ---
 
-## 🌐 Aplicação Interativa em Nuvem (Live Demo)
+## Aplicação Interativa (Demo)
 
-Acesse a aplicação web em tempo real hospedada no **Streamlit Cloud**:  
+Acesse a aplicação em tempo real hospedada no **Streamlit Cloud**:  
 👉 **[https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/](https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/)**
 
 ![Brain Tumor Classification V2 Streamlit Demo](artifacts/figures/git_landing_page.gif)
@@ -25,7 +24,7 @@ Acesse a aplicação web em tempo real hospedada no **Streamlit Cloud**:
 
 ---
 
-## 📌 Evolução do Projeto (V1 vs V2)
+## Evolução do Projeto (V1 vs V2)
 
 | Componente              | Versão 1 (Notebook Original)                   | Versão 2 (Estrutura Atual)                                                         |
 | :---------------------- | :--------------------------------------------- | :--------------------------------------------------------------------------------- |
@@ -42,33 +41,7 @@ Acesse a aplicação web em tempo real hospedada no **Streamlit Cloud**:
 
 ---
 
-## 🗺️ Roadmap e Status de Desenvolvimento
-
-### 🟢 Concluído
-
-- [x] Refatoração do repositório para pacote Python modular (`src/`) com docstrings no padrão Google PT-BR.
-- [x] Configuração centralizada via YAML ([config/config.yaml](config/config.yaml)).
-- [x] Integração com MLflow para rastreamento unificado de experimentos.
-- [x] **Hugging Face Model Registry & Nuvem:** Upload automatizado (`python main.py --mode upload_hf`) e download sob demanda no Streamlit a partir do repositório [`pazaborgs/brain_tumor_classification_V2`](https://huggingface.co/pazaborgs/brain_tumor_classification_V2).
-- [x] **Implantação em Nuvem no Streamlit Cloud:** Live Demo acessível em [`https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/`](https://cnnbraintumorclassificationv2-dzjnrtq4axyk3r8eue7eve.streamlit.app/).
-- [x] **Amostras Integradas no Git:** 12 imagens de amostragem MRI em `data/sample_mri/` para teste imediato.
-- [x] **Arquitetura `cnn_custom` Otimizada:** Blocos duplos de convolução no estilo VGG/ResNet, inicialização `he_normal` e dropout espacial progressivo (`0.15` a `0.40`).
-- [x] **Otimização de Pipeline I/O:** Pré-carregamento com `prefetch(tf.data.AUTOTUNE)` para eliminação de gargalos na GPU.
-- [x] **Integração Grad-CAM no App:** Visualização de mapas de calor de interpretabilidade (IA Explicável) em tempo real com `tf.GradientTape()`.
-- [x] Implementação da CLI multi-modo (`main.py --mode [train|evaluate|upload_hf|app]`).
-- [x] Dashboard interativo em Streamlit com suporte a inferência ao vivo e seleção amigável de amostras.
-- [x] Estratégia de fine-tuning com descongelamento seletivo de camadas superiores (`mixed10`, `top_conv`).
-- [x] Versionamento da configuração visual do Streamlit ([.streamlit/config.toml](.streamlit/config.toml)).
-- [x] **Design System e UI/UX:** Tipografia moderna (*Outfit*), paleta clínica (Tailwind colors), layout responsivo sem perdas de compressão (Lossless PNG) e hierarquia visual avançada no Leaderboard.
-- [x] Inclusão do documento do TCC original ([docs/TCC_brain_tumor_classification.pdf](docs/TCC_brain_tumor_classification.pdf)).
-
-### 🟡 Em Desenvolvimento (Work in Progress - WIP)
-
-- [ ] **Treinamento Final de 30 Épocas:** Execução do fine-tuning completo no Kaggle GPU T4 e atualização dos binários `.keras` no Hugging Face Hub.
-
----
-
-## 🎓 Contexto Acadêmico (TCC UNIVESP)
+## Contexto Acadêmico (TCC UNIVESP)
 
 Trabalho desenvolvido para obtenção do título de Bacharel em Ciência de Dados pela **UNIVESP** (Universidade Virtual do Estado de São Paulo), 2025.
 
@@ -79,7 +52,7 @@ Trabalho desenvolvido para obtenção do título de Bacharel em Ciência de Dado
 
 ---
 
-## 🩻 Base de Dados
+## Base de Dados
 
 Base de dados: **Brain Tumor Classification (MRI)** do Kaggle.
 
@@ -89,7 +62,7 @@ Base de dados: **Brain Tumor Classification (MRI)** do Kaggle.
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```text
 cnn_brain_tumor_classification_V2/
@@ -110,12 +83,11 @@ cnn_brain_tumor_classification_V2/
 │   └── decisoes_treinamento.md             # Documentação técnica de fine-tuning
 ├── artifacts/
 │   ├── models/                 # Binários dos modelos (.keras) - não versionados
-│   └── figures/                # Gráficos e matrizes de confusão (.png)
+│   └── figures/                # Gráficos, matrizes de confusão e GIF (git_landing_page.gif)
 ├── data/
 │   └── sample_mri/             # 12 imagens de amostra MRI (versionadas no Git)
 ├── .streamlit/
 │   └── config.toml             # Configuração do tema e visual do Streamlit
-├── git_landing_page.gif        # Demonstração animada da interface Streamlit
 ├── main.py                     # CLI e orquestrador do pipeline
 ├── app.py                      # Dashboard interativo Streamlit
 ├── pyproject.toml              # Especificação de dependências (uv)
@@ -125,9 +97,9 @@ cnn_brain_tumor_classification_V2/
 
 ---
 
-## 🛠️ Como Executar Localmente (Passo a Passo)
+## Como Executar Localmente (Passo a Passo)
 
-### 📋 Pré-requisitos
+### Pré-requisitos
 
 - **Python 3.10 ou superior** instalado na máquina.
 - **Gerenciador `uv`** (recomendado para instalação rápida de dependências):
@@ -203,6 +175,6 @@ uv run streamlit run app.py
 
 ---
 
-### ⚠️ Nota Legal
+### Nota Legal
 
 Este projeto foi desenvolvido para fins acadêmicos e de pesquisa (TCC UNIVESP). Não substitui laudos médicos nem deve ser utilizado para diagnósticos clínicos sem validação apropriada.
